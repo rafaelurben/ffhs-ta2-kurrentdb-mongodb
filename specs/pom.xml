@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ch.rafaelurben.edu.ffhs.ta2</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>specs-generator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>API Specs Generator</name>
+    <description>
+        This package is used to use the OpenAPI Generator to generate interfaces for the implementations and client.
+    </description>
+
+    <properties>
+        <codegen.skipIfSpecIsUnchanged>true</codegen.skipIfSpecIsUnchanged>
+    </properties>
+
+    <dependencies>
+        <!-- Swagger/OpenAPI -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- OpenAPI Generator - generate packages -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi.generator.maven-plugin.version}</version>
+                <executions>
+                    <!-- Server Stub -->
+                    <execution>
+                        <id>generate-server-stub</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/api-specs.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.build.directory}/generated-projects/server-stub</output>
+                            <groupId>ch.rafaelurben.edu.ffhs.ta2</groupId>
+                            <artifactId>server-stub</artifactId>
+                            <apiPackage>ch.rafaelurben.edu.ffhs.ta2.server.api</apiPackage>
+                            <modelPackage>ch.rafaelurben.edu.ffhs.ta2.server.model</modelPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <!-- Client -->
+                    <execution>
+                        <id>generate-api-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/api-specs.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <output>${project.build.directory}/generated-projects/api-client</output>
+                            <groupId>ch.rafaelurben.edu.ffhs.ta2</groupId>
+                            <artifactId>api-client</artifactId>
+                            <apiPackage>ch.rafaelurben.edu.ffhs.ta2.client.api</apiPackage>
+                            <modelPackage>ch.rafaelurben.edu.ffhs.ta2.client.model</modelPackage>
+                            <invokerPackage>ch.rafaelurben.edu.ffhs.ta2.client</invokerPackage>
+                            <configOptions>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Install generated packages -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>install-server-stub</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}/generated-projects/server-stub
+                            </workingDirectory>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>install</argument>
+                                <argument>-DskipTests</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-api-client</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}/generated-projects/api-client
+                            </workingDirectory>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>install</argument>
+                                <argument>-DskipTests</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
