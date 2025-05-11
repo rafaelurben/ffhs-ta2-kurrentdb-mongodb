@@ -1,0 +1,52 @@
+name: ta2
+services:
+  # MongoDB Database
+  mongodb_database:
+    image: mongo:8.0.9
+    container_name: mongodb
+    restart: on-failure
+    ports:
+      - "27017:27017"
+    volumes:
+      - type: volume
+        source: mongodb-volume-data
+        target: /data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+  # MongoDB Admin Interface
+  mongodb_admin:
+    image: mongo-express:1.0.2-20-alpine3.19
+    container_name: mongo-express
+    restart: on-failure
+    ports:
+      - "27018:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_URL: mongodb://user:password@mongodb:27017/
+      ME_CONFIG_BASICAUTH: false
+  # KurrentDB Database
+  kurrentdb:
+    image: docker.kurrent.io/kurrent-latest/kurrentdb:latest
+    container_name: kurrentdb
+    environment:
+      - KURRENTDB_CLUSTER_SIZE=1
+      - KURRENTDB_RUN_PROJECTIONS=All
+      - KURRENTDB_START_STANDARD_PROJECTIONS=true
+      - KURRENTDB_NODE_PORT=2113
+      - KURRENTDB_INSECURE=true
+      - KURRENTDB_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - "2113:2113"
+    volumes:
+      - type: volume
+        source: kurrentdb-volume-data
+        target: /var/lib/kurrentdb
+      - type: volume
+        source: kurrentdb-volume-logs
+        target: /var/log/kurrentdb
+volumes:
+  mongodb-volume-data:
+  kurrentdb-volume-data:
+  kurrentdb-volume-logs:
