@@ -1,19 +1,394 @@
 openapi: 3.0.3
 info:
   title: TA2 API
-  description: xxx
+  description: API for the TA2 application, providing endpoints to manage parent and child objects and their history.
   version: 1.0.0
   contact:
     name: Rafael Urben
     email: github@rafaelurben.ch
     url: https://www.rafaelurben.ch
 servers:
-  - url: 'http://localhost:8181/api/v1'
-  - url: 'http://localhost:8182/api/v1'
+  - description: MongoDB implementation
+    url: 'http://localhost:8181/api/v1'
+  - description: KurrentDB implementation
+    url: 'http://localhost:8182/api/v1'
 paths:
-
+  /objects:
+    get:
+      tags:
+        - Objects
+      summary: List all objects
+      description: Returns a list of objects.
+      operationId: getAllParents
+      responses:
+        '200':
+          description: A list of objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+    post:
+      tags:
+        - Objects
+      summary: Create a new object
+      description: Creates a new parent object and returns it.
+      operationId: createParent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParentObjectCreateDto'
+      responses:
+        '200':
+          description: The created object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParentObjectDto'
+  /objects/{parentId}:
+    parameters:
+      - $ref: '#/components/parameters/parentId'
+    get:
+      tags:
+        - Objects
+      summary: Get a specific parent object
+      description: Returns a specific parent object by ID.
+      operationId: getParent
+      responses:
+        '200':
+          description: The requested object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParentObjectDto'
+        '404':
+          description: Object not found.
+    patch:
+      tags:
+        - Objects
+      summary: Update a specific parent object
+      description: Updates a specific parent object by ID.
+      operationId: updateParent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParentObjectUpdateDto'
+      responses:
+        '200':
+          description: The updated object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParentObjectDto'
+        '404':
+          description: Object not found.
+    delete:
+      tags:
+        - Objects
+      summary: Delete a specific object
+      description: Deletes a specific parent object by ID with its children.
+      operationId: deleteParent
+      responses:
+        '204':
+          description: No content, deletion successful.
+        '404':
+          description: Object not found.
+  /objects/{parentId}/children:
+    parameters:
+      - $ref: '#/components/parameters/parentId'
+    post:
+      tags:
+        - Objects
+      summary: Create a new child object
+      description: Creates a new child object under a specific parent object.
+      operationId: createChild
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChildObjectCreateDto'
+      responses:
+        '200':
+          description: The created child object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildObjectDto'
+        '404':
+          description: Parent object not found.
+  /objects/{parentId}/children/{childId}:
+    parameters:
+      - $ref: '#/components/parameters/parentId'
+      - $ref: '#/components/parameters/childId'
+    get:
+      tags:
+        - Objects
+      summary: Get a specific child object
+      description: Returns a specific child object by ID under a parent object.
+      operationId: getChild
+      responses:
+        '200':
+          description: The requested child object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildObjectDto'
+        '404':
+          description: Child or parent object not found.
+    patch:
+      tags:
+        - Objects
+      summary: Update a specific child object
+      description: Updates a specific child object by ID under a parent object.
+      operationId: updateChild
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChildObjectUpdateDto'
+      responses:
+        '200':
+          description: The updated child object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildObjectDto'
+        '404':
+          description: Child or parent object not found.
+    delete:
+      tags:
+        - Objects
+      summary: Delete a specific child object
+      description: Deletes a specific child object by ID under a parent object.
+      operationId: deleteChild
+      responses:
+        '204':
+          description: No content, deletion successful.
+        '404':
+          description: Child or parent object not found.
+  /history/{parentId}/changes:
+    parameters:
+      - $ref: '#/components/parameters/parentId'
+    get:
+      tags:
+        - ObjectHistory
+      summary: Get history of a specific parent object
+      description: Returns the history of changes for a specific parent object.
+      operationId: getEntriesByParentId
+      responses:
+        '200':
+          description: The history of the parent object and all its children.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoryEntryDto'
+        '404':
+          description: Parent object not found.
+  /history/{parentId}/changes/{historyId}/preview:
+    parameters:
+      - $ref: '#/components/parameters/parentId'
+      - $ref: '#/components/parameters/historyId'
+    get:
+      tags:
+        - ObjectHistory
+      summary: Preview the object at a certain point in history
+      description: Get the state of the parent object at a specific history entry.
+      operationId: previewParentAtHistoryEntry
+      responses:
+        '200':
+          description: The parent object entry after this history entry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParentObjectDto'
+        '404':
+          description: Parent object or history entry not found.
+  /history/{parentId}/changes/{historyId}/restore:
+    parameters:
+      - $ref: '#/components/parameters/parentId'
+      - $ref: '#/components/parameters/historyId'
+    post:
+      tags:
+        - ObjectHistory
+      summary: Restore the object to a specific state in history
+      description: Reverts all changes made after the specified history entry.
+      operationId: restoreParentToHistoryEntry
+      responses:
+        '200':
+          description: The parent object entry after the restore operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParentObjectDto'
+        '404':
+          description: Parent object or history entry not found.
+        '409':
+          description: Conflict, the change cannot be reverted.
 components:
   parameters:
-
+    parentId:
+      name: parentId
+      in: path
+      description: The ID of the parent object.
+      required: true
+      schema:
+        type: string
+    childId:
+      name: childId
+      in: path
+      description: The ID of the child object.
+      required: true
+      schema:
+        type: string
+    historyId:
+      name: historyId
+      in: path
+      description: The ID of the history entry.
+      required: true
+      schema:
+        type: string
   schemas:
-
+    ParentObjectCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [ name ]
+    ParentObjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChildObjectDto'
+      required: [ id, name, children ]
+    ParentObjectUpdateDto:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [ name ]
+    ChildObjectCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: integer
+      required: [ name, value ]
+    ChildObjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        value:
+          type: integer
+      required: [ id, name, value ]
+    ChildObjectUpdateDto:
+      type: object
+      properties:
+        name:
+          type: string
+        valueChange:
+          type: integer
+      required: [ name, valueChange ]
+    HistoryEntryDto:
+      oneOf:
+        - $ref: '#/components/schemas/ParentCreatedEvent'
+        - $ref: '#/components/schemas/ParentUpdatedEvent'
+        - $ref: '#/components/schemas/ParentDeletedEvent'
+        - $ref: '#/components/schemas/ChildCreatedEvent'
+        - $ref: '#/components/schemas/ChildUpdatedEvent'
+        - $ref: '#/components/schemas/ChildDeletedEvent'
+      discriminator:
+        propertyName: changeType
+        mapping:
+          ParentCreated: '#/components/schemas/ParentCreatedEvent'
+          ParentUpdated: '#/components/schemas/ParentUpdatedEvent'
+          ParentDeleted: '#/components/schemas/ParentDeletedEvent'
+          ChildCreated: '#/components/schemas/ChildCreatedEvent'
+          ChildUpdated: '#/components/schemas/ChildUpdatedEvent'
+          ChildDeleted: '#/components/schemas/ChildDeletedEvent'
+    EventBaseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        changeType:
+          type: string
+        parentId:
+          type: string
+        revertsHistoryId:
+          type: string
+          description: The history entry this change reverts, if applicable.
+      required: [ id, timestamp, changeType, parentId ]
+    ParentCreatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventBaseDto'
+        - type: object
+          properties:
+            createData:
+              $ref: '#/components/schemas/ParentObjectDto'
+          required: [ createData ]
+    ParentUpdatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventBaseDto'
+        - type: object
+          properties:
+            changeData:
+              $ref: '#/components/schemas/ParentObjectUpdateDto'
+          required: [ changeData ]
+    ParentDeletedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventBaseDto'
+    ChildCreatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventBaseDto'
+        - type: object
+          properties:
+            childId:
+              type: string
+            createData:
+              $ref: '#/components/schemas/ChildObjectDto'
+          required: [ childId, createData ]
+    ChildUpdatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventBaseDto'
+        - type: object
+          properties:
+            childId:
+              type: string
+            changeData:
+              $ref: '#/components/schemas/ChildObjectUpdateDto'
+          required: [ childId, changeData ]
+    ChildDeletedEvent:
+      allOf:
+        - $ref: '#/components/schemas/EventBaseDto'
+        - type: object
+          properties:
+            childId:
+              type: string
+          required: [ childId ]
