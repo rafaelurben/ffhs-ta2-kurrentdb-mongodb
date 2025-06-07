@@ -15,6 +15,13 @@
     <description>Implementation using KurrentDB</description>
 
     <dependencies>
+        <!-- API Stub -->
+        <dependency>
+            <groupId>ch.rafaelurben.edu.ffhs.ta2</groupId>
+            <artifactId>server-stub</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

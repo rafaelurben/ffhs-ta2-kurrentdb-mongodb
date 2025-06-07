@@ -28,12 +28,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    name:
-                      type: string
+                  $ref: '#/components/schemas/ParentObjectDto'
     post:
       tags:
         - Objects

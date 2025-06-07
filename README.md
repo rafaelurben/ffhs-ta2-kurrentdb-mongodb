@@ -5,7 +5,7 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 ## Requirements
 
 - Git
-- Docker with docker-compose installed
+- Docker
 - Java 21+
 - Maven
 
@@ -18,11 +18,11 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
     ```
 2. Run the Docker containers:
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
-3. Compile the Java projects:
+3. Compile and install the Java projects:
     ```bash
-    mvn compile
+    mvn clean compile install
     ```
 
 ## Ports and services
