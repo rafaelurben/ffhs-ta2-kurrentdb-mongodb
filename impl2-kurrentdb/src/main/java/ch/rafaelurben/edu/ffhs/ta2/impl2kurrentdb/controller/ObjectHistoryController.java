@@ -7,7 +7,9 @@ import ch.rafaelurben.edu.ffhs.ta2.server.model.HistoryEntryDto;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.ParentObjectDto;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class ObjectHistoryController implements ObjectHistoryApi {
   ObjectService objectService;
 
