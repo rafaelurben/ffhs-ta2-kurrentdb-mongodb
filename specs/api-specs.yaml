@@ -309,21 +309,21 @@ components:
       required: [ name, valueChange ]
     HistoryEntryDto:
       oneOf:
-        - $ref: '#/components/schemas/ParentCreatedEvent'
-        - $ref: '#/components/schemas/ParentUpdatedEvent'
-        - $ref: '#/components/schemas/ParentDeletedEvent'
-        - $ref: '#/components/schemas/ChildCreatedEvent'
-        - $ref: '#/components/schemas/ChildUpdatedEvent'
-        - $ref: '#/components/schemas/ChildDeletedEvent'
+        - $ref: '#/components/schemas/ParentCreatedEventDto'
+        - $ref: '#/components/schemas/ParentUpdatedEventDto'
+        - $ref: '#/components/schemas/ParentDeletedEventDto'
+        - $ref: '#/components/schemas/ChildCreatedEventDto'
+        - $ref: '#/components/schemas/ChildUpdatedEventDto'
+        - $ref: '#/components/schemas/ChildDeletedEventDto'
       discriminator:
         propertyName: changeType
         mapping:
-          ParentCreated: '#/components/schemas/ParentCreatedEvent'
-          ParentUpdated: '#/components/schemas/ParentUpdatedEvent'
-          ParentDeleted: '#/components/schemas/ParentDeletedEvent'
-          ChildCreated: '#/components/schemas/ChildCreatedEvent'
-          ChildUpdated: '#/components/schemas/ChildUpdatedEvent'
-          ChildDeleted: '#/components/schemas/ChildDeletedEvent'
+          ParentCreated: '#/components/schemas/ParentCreatedEventDto'
+          ParentUpdated: '#/components/schemas/ParentUpdatedEventDto'
+          ParentDeleted: '#/components/schemas/ParentDeletedEventDto'
+          ChildCreated: '#/components/schemas/ChildCreatedEventDto'
+          ChildUpdated: '#/components/schemas/ChildUpdatedEventDto'
+          ChildDeleted: '#/components/schemas/ChildDeletedEventDto'
     EventBaseDto:
       type: object
       properties:
@@ -340,7 +340,7 @@ components:
           type: string
           description: The history entry this change reverts, if applicable.
       required: [ id, timestamp, changeType, parentId ]
-    ParentCreatedEvent:
+    ParentCreatedEventDto:
       allOf:
         - $ref: '#/components/schemas/EventBaseDto'
         - type: object
@@ -348,7 +348,7 @@ components:
             createData:
               $ref: '#/components/schemas/ParentObjectDto'
           required: [ createData ]
-    ParentUpdatedEvent:
+    ParentUpdatedEventDto:
       allOf:
         - $ref: '#/components/schemas/EventBaseDto'
         - type: object
@@ -356,10 +356,10 @@ components:
             changeData:
               $ref: '#/components/schemas/ParentObjectUpdateDto'
           required: [ changeData ]
-    ParentDeletedEvent:
+    ParentDeletedEventDto:
       allOf:
         - $ref: '#/components/schemas/EventBaseDto'
-    ChildCreatedEvent:
+    ChildCreatedEventDto:
       allOf:
         - $ref: '#/components/schemas/EventBaseDto'
         - type: object
@@ -369,7 +369,7 @@ components:
             createData:
               $ref: '#/components/schemas/ChildObjectDto'
           required: [ childId, createData ]
-    ChildUpdatedEvent:
+    ChildUpdatedEventDto:
       allOf:
         - $ref: '#/components/schemas/EventBaseDto'
         - type: object
@@ -379,7 +379,7 @@ components:
             changeData:
               $ref: '#/components/schemas/ChildObjectUpdateDto'
           required: [ childId, changeData ]
-    ChildDeletedEvent:
+    ChildDeletedEventDto:
       allOf:
         - $ref: '#/components/schemas/EventBaseDto'
         - type: object
