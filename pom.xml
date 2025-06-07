@@ -34,6 +34,8 @@
         <openapi.swagger-annotations.version>2.2.20</openapi.swagger-annotations.version>
         <openapi.generator.maven-plugin.version>7.12.0</openapi.generator.maven-plugin.version>
 
+        <mapstruct.version>1.6.2</mapstruct.version>
+
         <spotless.version>2.43.0</spotless.version>
     </properties>
 
@@ -70,6 +72,14 @@
                 <version>${openapi.swagger-annotations.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <!-- Mapstruct -->
+            <!-- Mapstruct -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -85,6 +95,11 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
+                            </path>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
