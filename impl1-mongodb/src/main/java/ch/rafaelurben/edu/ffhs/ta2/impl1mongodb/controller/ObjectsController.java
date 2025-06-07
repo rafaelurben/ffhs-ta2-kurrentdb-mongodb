@@ -7,13 +7,17 @@ import ch.rafaelurben.edu.ffhs.ta2.server.api.ObjectsApi;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.*;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class ObjectsController implements ObjectsApi {
-  ObjectService objectService;
+  private final ObjectService objectService;
 
   @Override
   public ResponseEntity<ParentObjectDto> createParent(
