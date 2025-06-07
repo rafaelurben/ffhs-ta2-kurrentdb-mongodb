@@ -334,8 +334,6 @@ components:
           format: date-time
         changeType:
           type: string
-        parentId:
-          type: string
         revertsHistoryId:
           type: string
           description: The history entry this change reverts, if applicable.
