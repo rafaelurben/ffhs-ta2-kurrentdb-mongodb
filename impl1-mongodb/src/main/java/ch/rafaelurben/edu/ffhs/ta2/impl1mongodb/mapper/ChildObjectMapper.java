@@ -12,6 +12,8 @@ import org.mapstruct.MappingConstants;
 public interface ChildObjectMapper {
   ChildObjectDto toDto(ChildObject childObject);
 
+  ChildObject toEntity(ChildObjectDto childObjectDto);
+
   ChildObject toEntity(ChildObjectCreateDto childObjectCreateDto);
 
   default void updateEntity(ChildObject childObject, ChildObjectUpdateDto childObjectUpdateDto) {

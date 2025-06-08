@@ -18,6 +18,8 @@ public interface ParentObjectMapper {
 
   List<ParentObjectDto> toDto(List<ParentObject> parentObjects);
 
+  ParentObject toEntity(ParentObjectDto parentObjectDto);
+
   ParentObject toEntity(ParentObjectCreateDto parentObjectCreateDto);
 
   void updateEntity(

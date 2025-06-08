@@ -1,6 +1,7 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.service;
 
+import ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.exceptions.ImpossibleHistoryException;
 import ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.mapper.ChildObjectMapper;
 import ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.mapper.EventMapper;
@@ -16,9 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +28,8 @@ public class ObjectServiceImpl implements ObjectService {
   private final ParentObjectMapper parentObjectMapper;
   private final ChildObjectMapper childObjectMapper;
   private final EventMapper eventMapper;
+
+  private final HistoryReconstructorService historyReconstructorService;
 
   private String generateId() {
     return new ObjectId().toString();
@@ -57,6 +58,13 @@ public class ObjectServiceImpl implements ObjectService {
         .filter(child -> child.getId().equals(childId))
         .findFirst()
         .orElseThrow(() -> new ResourceNotFoundException("Child object not found"));
+  }
+
+  private ParentObjectHistory getParentObjectHistory(String parentId)
+      throws ResourceNotFoundException {
+    return historyRepository
+        .findByParentObjectId(parentId)
+        .orElseThrow(() -> new ResourceNotFoundException("Parent object history not found"));
   }
 
   @Override
@@ -178,24 +186,27 @@ public class ObjectServiceImpl implements ObjectService {
   @Override
   public List<HistoryEntryDto> getAllHistoryEntriesByParentId(String parentId)
       throws ResourceNotFoundException {
-    ParentObjectHistory history =
-        historyRepository
-            .findByParentObjectId(parentId)
-            .orElseThrow(() -> new ResourceNotFoundException("Parent object history not found"));
+    ParentObjectHistory history = getParentObjectHistory(parentId);
     return eventMapper.toDto(history.getEvents());
   }
 
   @Override
   public ParentObjectDto previewParentAtHistoryEntry(String parentId, String historyId)
-      throws ResourceNotFoundException {
-    // TODO
-    throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+      throws ResourceNotFoundException, ImpossibleHistoryException {
+    ParentObjectHistory history = getParentObjectHistory(parentId);
+    ParentObject reconstructedParent =
+        historyReconstructorService.reconstructParentAtHistoryEntry(history, historyId);
+    return parentObjectMapper.toDto(reconstructedParent);
   }
 
   @Override
   public ParentObjectDto restoreParentToHistoryEntry(String parentId, String historyId)
-      throws ResourceNotFoundException {
-    // TODO
-    throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+      throws ResourceNotFoundException, ImpossibleHistoryException {
+    ParentObjectHistory history = getParentObjectHistory(parentId);
+    ParentObject reconstructedParent =
+        historyReconstructorService.restoreParentToHistoryEntry(history, historyId);
+    objectRepository.save(reconstructedParent);
+    historyRepository.save(history);
+    return parentObjectMapper.toDto(reconstructedParent);
   }
 }

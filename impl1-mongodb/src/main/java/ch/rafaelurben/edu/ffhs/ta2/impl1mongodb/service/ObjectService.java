@@ -1,6 +1,7 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.service;
 
+import ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.exceptions.ImpossibleHistoryException;
 import ch.rafaelurben.edu.ffhs.ta2.impl1mongodb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.*;
 import java.util.List;
@@ -37,8 +38,8 @@ public interface ObjectService {
       throws ResourceNotFoundException;
 
   ParentObjectDto previewParentAtHistoryEntry(String parentId, String historyId)
-      throws ResourceNotFoundException;
+      throws ResourceNotFoundException, ImpossibleHistoryException;
 
   ParentObjectDto restoreParentToHistoryEntry(String parentId, String historyId)
-      throws ResourceNotFoundException;
+      throws ResourceNotFoundException, ImpossibleHistoryException;
 }
