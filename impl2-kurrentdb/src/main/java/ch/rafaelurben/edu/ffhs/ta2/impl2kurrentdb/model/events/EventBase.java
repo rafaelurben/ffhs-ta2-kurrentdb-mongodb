@@ -1,6 +1,7 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.model.events;
 
+import ch.rafaelurben.edu.ffhs.ta2.server.model.ChangeType;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.time.LocalDateTime;
 import lombok.Data;

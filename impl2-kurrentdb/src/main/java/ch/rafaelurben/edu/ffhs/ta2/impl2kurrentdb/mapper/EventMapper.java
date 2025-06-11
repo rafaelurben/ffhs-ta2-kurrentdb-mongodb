@@ -26,12 +26,12 @@ public interface EventMapper {
   @Named("mapSingleEvent")
   default HistoryEntryDto toDto(EventBase event) {
     return switch (event.getChangeType()) {
-      case ParentCreated -> toDto((ParentCreatedEvent) event);
-      case ParentUpdated -> toDto((ParentUpdatedEvent) event);
-      case ParentDeleted -> toDto((ParentDeletedEvent) event);
-      case ChildCreated -> toDto((ChildCreatedEvent) event);
-      case ChildUpdated -> toDto((ChildUpdatedEvent) event);
-      case ChildDeleted -> toDto((ChildDeletedEvent) event);
+      case PARENT_CREATED -> toDto((ParentCreatedEvent) event);
+      case PARENT_UPDATED -> toDto((ParentUpdatedEvent) event);
+      case PARENT_DELETED -> toDto((ParentDeletedEvent) event);
+      case CHILD_CREATED -> toDto((ChildCreatedEvent) event);
+      case CHILD_UPDATED -> toDto((ChildUpdatedEvent) event);
+      case CHILD_DELETED -> toDto((ChildDeletedEvent) event);
     };
   }
 

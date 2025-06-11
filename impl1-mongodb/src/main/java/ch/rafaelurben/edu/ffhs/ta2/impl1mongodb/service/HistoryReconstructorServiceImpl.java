@@ -94,12 +94,12 @@ public class HistoryReconstructorServiceImpl implements HistoryReconstructorServ
   private ParentObject applyEvent(ParentObject parentObject, EventBase event)
       throws ImpossibleHistoryException {
     return switch (event.getChangeType()) {
-      case ParentCreated -> applyEvent(parentObject, (ParentCreatedEvent) event);
-      case ParentUpdated -> applyEvent(parentObject, (ParentUpdatedEvent) event);
-      case ParentDeleted -> applyEvent(parentObject, (ParentDeletedEvent) event);
-      case ChildCreated -> applyEvent(parentObject, (ChildCreatedEvent) event);
-      case ChildUpdated -> applyEvent(parentObject, (ChildUpdatedEvent) event);
-      case ChildDeleted -> applyEvent(parentObject, (ChildDeletedEvent) event);
+      case PARENT_CREATED -> applyEvent(parentObject, (ParentCreatedEvent) event);
+      case PARENT_UPDATED -> applyEvent(parentObject, (ParentUpdatedEvent) event);
+      case PARENT_DELETED -> applyEvent(parentObject, (ParentDeletedEvent) event);
+      case CHILD_CREATED -> applyEvent(parentObject, (ChildCreatedEvent) event);
+      case CHILD_UPDATED -> applyEvent(parentObject, (ChildUpdatedEvent) event);
+      case CHILD_DELETED -> applyEvent(parentObject, (ChildDeletedEvent) event);
     };
   }
 
@@ -153,12 +153,12 @@ public class HistoryReconstructorServiceImpl implements HistoryReconstructorServ
       throws ImpossibleHistoryException {
     EventBase newEvent =
         switch (event.getChangeType()) {
-          case ParentCreated -> createReverseEvent((ParentCreatedEvent) event);
-          case ParentUpdated -> createReverseEvent(beforeState, (ParentUpdatedEvent) event);
-          case ParentDeleted -> createReverseEvent(beforeState, (ParentDeletedEvent) event);
-          case ChildCreated -> createReverseEvent((ChildCreatedEvent) event);
-          case ChildUpdated -> createReverseEvent(beforeState, (ChildUpdatedEvent) event);
-          case ChildDeleted -> createReverseEvent(beforeState, (ChildDeletedEvent) event);
+          case PARENT_CREATED -> createReverseEvent((ParentCreatedEvent) event);
+          case PARENT_UPDATED -> createReverseEvent(beforeState, (ParentUpdatedEvent) event);
+          case PARENT_DELETED -> createReverseEvent(beforeState, (ParentDeletedEvent) event);
+          case CHILD_CREATED -> createReverseEvent((ChildCreatedEvent) event);
+          case CHILD_UPDATED -> createReverseEvent(beforeState, (ChildUpdatedEvent) event);
+          case CHILD_DELETED -> createReverseEvent(beforeState, (ChildDeletedEvent) event);
         };
     newEvent.setTimestamp(LocalDateTime.now());
     newEvent.setId(new ObjectId().toString());

@@ -96,12 +96,12 @@ public class AggregateServiceImpl implements AggregateService {
   private ParentObjectDto applyEvent(ParentObjectDto parentObjectDto, EventBase event)
       throws ImpossibleHistoryException {
     return switch (event.getChangeType()) {
-      case ParentCreated -> applyEvent(parentObjectDto, (ParentCreatedEvent) event);
-      case ParentUpdated -> applyEvent(parentObjectDto, (ParentUpdatedEvent) event);
-      case ParentDeleted -> applyEvent(parentObjectDto);
-      case ChildCreated -> applyEvent(parentObjectDto, (ChildCreatedEvent) event);
-      case ChildUpdated -> applyEvent(parentObjectDto, (ChildUpdatedEvent) event);
-      case ChildDeleted -> applyEvent(parentObjectDto, (ChildDeletedEvent) event);
+      case PARENT_CREATED -> applyEvent(parentObjectDto, (ParentCreatedEvent) event);
+      case PARENT_UPDATED -> applyEvent(parentObjectDto, (ParentUpdatedEvent) event);
+      case PARENT_DELETED -> applyEvent(parentObjectDto);
+      case CHILD_CREATED -> applyEvent(parentObjectDto, (ChildCreatedEvent) event);
+      case CHILD_UPDATED -> applyEvent(parentObjectDto, (ChildUpdatedEvent) event);
+      case CHILD_DELETED -> applyEvent(parentObjectDto, (ChildDeletedEvent) event);
     };
   }
 
@@ -154,12 +154,12 @@ public class AggregateServiceImpl implements AggregateService {
       throws ImpossibleHistoryException {
     EventBase newEvent =
         switch (event.getChangeType()) {
-          case ParentCreated -> createReverseEvent((ParentCreatedEvent) event);
-          case ParentUpdated -> createReverseEvent(beforeState, (ParentUpdatedEvent) event);
-          case ParentDeleted -> createReverseEvent(beforeState, (ParentDeletedEvent) event);
-          case ChildCreated -> createReverseEvent((ChildCreatedEvent) event);
-          case ChildUpdated -> createReverseEvent(beforeState, (ChildUpdatedEvent) event);
-          case ChildDeleted -> createReverseEvent(beforeState, (ChildDeletedEvent) event);
+          case PARENT_CREATED -> createReverseEvent((ParentCreatedEvent) event);
+          case PARENT_UPDATED -> createReverseEvent(beforeState, (ParentUpdatedEvent) event);
+          case PARENT_DELETED -> createReverseEvent(beforeState, (ParentDeletedEvent) event);
+          case CHILD_CREATED -> createReverseEvent((ChildCreatedEvent) event);
+          case CHILD_UPDATED -> createReverseEvent(beforeState, (ChildUpdatedEvent) event);
+          case CHILD_DELETED -> createReverseEvent(beforeState, (ChildDeletedEvent) event);
         };
     newEvent.setTimestamp(LocalDateTime.now());
     newEvent.setId(UUID.randomUUID().toString());

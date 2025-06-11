@@ -1,6 +1,7 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.model.events;
 
+import ch.rafaelurben.edu.ffhs.ta2.server.model.ChangeType;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.ChildObjectUpdateDto;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,6 @@ public class ChildUpdatedEvent extends EventBase {
     this.childId = childId;
     this.changeData = changeData;
     this.setRevertsHistoryId(revertsHistoryId);
-    this.setChangeType(ChangeType.ChildUpdated);
+    this.setChangeType(ChangeType.CHILD_UPDATED);
   }
 }
