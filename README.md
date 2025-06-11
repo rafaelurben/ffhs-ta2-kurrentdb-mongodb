@@ -27,10 +27,10 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 
 ## Ports and services
 
-| Service                          | Port                            |
-|----------------------------------|---------------------------------|
-| API Implementation 1 (MongoDB)   | 8081                            |
-| MongoDB database                 | 27017                           |
-| MongoDB admin (mongo-express)    | [27018](http://localhost:27018) |
-| API Implementation 2 (KurrentDB) | 8082                            |
-| KurrentDB database               | 2113                            |
+| Service                                | Port                            |
+|----------------------------------------|---------------------------------|
+| API Implementation 1 (MongoDB)         | 8081                            |
+| MongoDB database                       | 27017                           |
+| MongoDB admin (mongo-express)          | [27018](http://localhost:27018) |
+| API Implementation 2 (KurrentDB)       | 8082                            |
+| KurrentDB database (incl. embedded UI) | [2113](http://localhost:2113)   |

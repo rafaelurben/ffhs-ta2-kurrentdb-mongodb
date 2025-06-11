@@ -7,12 +7,16 @@ import ch.rafaelurben.edu.ffhs.ta2.server.api.ObjectHistoryApi;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.HistoryEntryDto;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.ParentObjectDto;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class ObjectHistoryController implements ObjectHistoryApi {
-  ObjectService objectService;
+  private final ObjectService objectService;
 
   @Override
   public ResponseEntity<List<HistoryEntryDto>> getEntriesByParentId(String parentId) {
