@@ -3,6 +3,7 @@ package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service;
 
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.config.KurrentDBConfig;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ImpossibleHistoryException;
+import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.KurrentException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.model.events.EventBase;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,11 +32,14 @@ public class StreamServiceImpl implements StreamService {
               .readStream(
                   kurrentDBConfig.getStreamName(parentId), ReadStreamOptions.get().fromStart())
               .get();
-    } catch (ExecutionException | InterruptedException e) {
+    } catch (ExecutionException e) {
       if (e.getCause() instanceof StreamNotFoundException) {
         throw new ResourceNotFoundException("Parent object with ID " + parentId + " not found.");
       }
-      throw new RuntimeException(e);
+      throw new KurrentException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new KurrentException("Interrupted while reading stream for parent ID " + parentId, e);
     }
 
     List<EventBase> events =
@@ -43,11 +47,11 @@ public class StreamServiceImpl implements StreamService {
             .map(ResolvedEvent::getOriginalEvent)
             .map(RecordedEvent::getEventData)
             .map(
-                (eventData) -> {
+                eventData -> {
                   try {
                     return jsonMapper.readValue(eventData, EventBase.class);
                   } catch (IOException e) {
-                    throw new RuntimeException("Failed to parse event data", e);
+                    throw new KurrentException("Failed to parse event data", e);
                   }
                 })
             .toList();
@@ -67,8 +71,11 @@ public class StreamServiceImpl implements StreamService {
       EventData eventData =
           EventData.builderAsJson(eventId, event.getChangeType().toString(), eventBytes).build();
       eventStore.appendToStream(kurrentDBConfig.getStreamName(parentId), eventData).get();
-    } catch (ExecutionException | InterruptedException | JsonProcessingException e) {
-      throw new RuntimeException("Failed to store event for parent ID " + parentId, e);
+    } catch (ExecutionException | JsonProcessingException e) {
+      throw new KurrentException("Failed to store event for parent ID " + parentId, e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new KurrentException("Interrupted while storing event for parent ID " + parentId, e);
     }
   }
 }

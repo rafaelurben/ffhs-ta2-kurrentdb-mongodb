@@ -89,7 +89,6 @@
             </dependency>
 
             <!-- Mapstruct -->
-            <!-- Mapstruct -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>

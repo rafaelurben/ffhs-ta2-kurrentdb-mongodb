@@ -42,8 +42,7 @@ public class HistoryReconstructorServiceImpl implements HistoryReconstructorServ
     return parentObject;
   }
 
-  private ParentObject applyEvent(ParentObject parentObject, ParentDeletedEvent parentDeletedEvent)
-      throws ImpossibleHistoryException {
+  private ParentObject applyEvent(ParentObject parentObject) throws ImpossibleHistoryException {
     if (parentObject == null) {
       throw new ImpossibleHistoryException("Parent object is null when trying to delete parent");
     }
@@ -96,7 +95,7 @@ public class HistoryReconstructorServiceImpl implements HistoryReconstructorServ
     return switch (event.getChangeType()) {
       case PARENT_CREATED -> applyEvent(parentObject, (ParentCreatedEvent) event);
       case PARENT_UPDATED -> applyEvent(parentObject, (ParentUpdatedEvent) event);
-      case PARENT_DELETED -> applyEvent(parentObject, (ParentDeletedEvent) event);
+      case PARENT_DELETED -> applyEvent(parentObject);
       case CHILD_CREATED -> applyEvent(parentObject, (ChildCreatedEvent) event);
       case CHILD_UPDATED -> applyEvent(parentObject, (ChildUpdatedEvent) event);
       case CHILD_DELETED -> applyEvent(parentObject, (ChildDeletedEvent) event);

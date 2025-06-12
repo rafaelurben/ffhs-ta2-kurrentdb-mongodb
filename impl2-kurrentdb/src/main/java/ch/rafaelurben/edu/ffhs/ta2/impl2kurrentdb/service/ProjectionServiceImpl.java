@@ -4,6 +4,7 @@ package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.config.KurrentDBConfig;
+import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.KurrentException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.model.result.AllParentsProjectionResult;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.model.result.SingleParentProjectionResult;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.ParentObjectDto;
@@ -14,13 +15,16 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProjectionServiceImpl implements ProjectionService {
@@ -45,22 +49,29 @@ public class ProjectionServiceImpl implements ProjectionService {
     try {
       kurrentDBProjectionManagementClient.create(projectionName, projectionCode).get();
       kurrentDBProjectionManagementClient.enable(projectionName).get();
-    } catch (ExecutionException | InterruptedException ex) {
+    } catch (ExecutionException ex) {
       if (ex.getMessage().contains("Conflict")) {
-        System.out.println(
-            "Projection " + projectionName + " already exists, trying to update it.");
+        log.info("Projection {} already exists, trying to update it.", projectionName);
 
         try {
           kurrentDBProjectionManagementClient.update(projectionName, projectionCode).get();
-          System.out.println("Projection " + projectionName + " updated successfully.");
-        } catch (ExecutionException | InterruptedException e) {
-          System.err.println("Failed to update projection: " + projectionName);
-          throw new RuntimeException("Failed to update projection: " + projectionName, e);
+          log.info("Projection {} updated successfully.", projectionName);
+        } catch (ExecutionException e) {
+          log.error("Failed to update projection: {}", projectionName);
+          throw new KurrentException("Failed to update projection: " + projectionName, e);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          log.error("Projection update interrupted: {}", projectionName);
+          throw new KurrentException("Projection update interrupted: " + projectionName, e);
         }
       } else {
-        System.err.println("Failed to create projection: " + projectionName);
-        throw new RuntimeException("Failed to create or update projection: " + projectionName, ex);
+        log.error("Failed to create projection: {}", projectionName);
+        throw new KurrentException("Failed to create or update projection: " + projectionName, ex);
       }
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      log.error("Projection creation interrupted: {}", projectionName);
+      throw new KurrentException("Projection creation interrupted: " + projectionName, ex);
     }
   }
 
@@ -93,8 +104,11 @@ public class ProjectionServiceImpl implements ProjectionService {
               .getResult(projectionName, AllParentsProjectionResult.class)
               .get();
       return result.parents();
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to read all parents from projection", e);
+    } catch (CancellationException | ExecutionException e) {
+      throw new KurrentException("Failed to read all parents from projection", e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new KurrentException("Interrupted while reading all parents from projection", e);
     }
   }
 
@@ -109,8 +123,11 @@ public class ProjectionServiceImpl implements ProjectionService {
                   GetProjectionResultOptions.get().partition(parentId))
               .get();
       return result.parent();
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to read parent object from projection: " + parentId, e);
+    } catch (CancellationException | ExecutionException e) {
+      throw new KurrentException("Failed to read parent object from projection: " + parentId, e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new KurrentException("Interrupted while reading all parents from projection", e);
     }
   }
 }

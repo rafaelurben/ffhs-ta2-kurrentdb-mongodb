@@ -13,10 +13,6 @@ public class StartupListener {
 
   @PostConstruct
   public void initProjections() {
-    try {
-      projectionService.setupProjections();
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to initialize all object projection", e);
-    }
+    projectionService.setupProjections();
   }
 }

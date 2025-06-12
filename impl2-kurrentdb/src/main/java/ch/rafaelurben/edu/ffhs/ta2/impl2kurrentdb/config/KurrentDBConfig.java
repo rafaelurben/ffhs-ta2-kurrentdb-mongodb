@@ -18,12 +18,12 @@ public class KurrentDBConfig {
   String connectionString;
 
   @Bean
-  public KurrentDBClient EventStoreDBClient() {
+  public KurrentDBClient eventStoreDBClient() {
     return KurrentDBClient.create(KurrentDBConnectionString.parseOrThrow(connectionString));
   }
 
   @Bean
-  public KurrentDBProjectionManagementClient ProjectionManagementClient(
+  public KurrentDBProjectionManagementClient projectionManagementClient(
       KurrentDBClient kurrentDBClient) {
     return KurrentDBProjectionManagementClient.from(kurrentDBClient);
   }
