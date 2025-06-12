@@ -36,7 +36,11 @@ public class ObjectServiceImpl implements ObjectService {
 
   private ParentObjectDto getParentObjectFromProjection(String parentId)
       throws ResourceNotFoundException {
-    return projectionService.readParentFromProjection(parentId);
+    ParentObjectDto parentObject = projectionService.readParentFromProjection(parentId);
+    if (parentObject == null) {
+      throw new ResourceNotFoundException("Parent object not found in projection");
+    }
+    return parentObject;
   }
 
   private ChildObjectDto getChildObject(ParentObjectDto parentObject, String childId)
