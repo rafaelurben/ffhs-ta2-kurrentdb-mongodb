@@ -233,6 +233,20 @@ paths:
           description: Parent object or history entry not found.
         '409':
           description: Conflict, the change cannot be reverted.
+  /status:
+    get:
+      tags:
+        - Status
+      summary: Connection test
+      description: Returns a 200 response with a simple message to indicate the connection is successful.
+      operationId: testConnection
+      responses:
+        '200':
+          description: Connection successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionTestResponseDto'
 components:
   parameters:
     parentId:
@@ -397,3 +411,10 @@ components:
         - ChildCreated
         - ChildUpdated
         - ChildDeleted
+    ConnectionTestResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Connection successful"
+      required: [ message ]
