@@ -177,3 +177,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/git,java,maven,windows,intellij+all
 
+stats/data/

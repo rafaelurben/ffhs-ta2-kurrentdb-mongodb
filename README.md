@@ -22,11 +22,15 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
     ```
 3. Compile and package the Java projects:
     ```bash
-    mvn compile package
+    mvn clean compile package
     ```
 4. Start the API implementations in docker containers for resource isolation:
     ```bash
     docker compose -f docker-compose-testing.yaml up -d --build
+    ```
+5. Run the tests:
+    ```bash
+    mvn -f testing-client/pom.xml clean compile exec:java
     ```
 
 ## Ports and services
