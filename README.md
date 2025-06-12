@@ -6,7 +6,7 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 
 - Git
 - Docker
-- Java 21+
+- Java 21
 - Maven
 
 ## Installation
@@ -16,21 +16,25 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
     git clone https://github.com/rafaelurben/ffhs-ta2-kurrentdb-mongodb.git
     cd ffhs-ta2-kurrentdb-mongodb
     ```
-2. Run the Docker containers:
+2. Run the infrastructure Docker containers:
     ```bash
     docker compose up -d
     ```
-3. Compile and install the Java projects:
+3. Compile and package the Java projects:
     ```bash
-    mvn clean compile install
+    mvn compile package
+    ```
+4. Start the API implementations in docker containers for resource isolation:
+    ```bash
+    docker compose -f docker-compose-testing.yaml up -d --build
     ```
 
 ## Ports and services
 
 | Service                                | Port                            |
 |----------------------------------------|---------------------------------|
-| API Implementation 1 (MongoDB)         | 8081                            |
+| API Implementation 1 (MongoDB)         | 8181                            |
 | MongoDB database                       | 27017                           |
 | MongoDB admin (mongo-express)          | [27018](http://localhost:27018) |
-| API Implementation 2 (KurrentDB)       | 8082                            |
+| API Implementation 2 (KurrentDB)       | 8182                            |
 | KurrentDB database (incl. embedded UI) | [2113](http://localhost:2113)   |

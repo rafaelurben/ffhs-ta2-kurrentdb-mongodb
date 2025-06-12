@@ -1,0 +1,37 @@
+name: ta2-testing
+services:
+  # Implementation 1
+  impl1_mongodb:
+    image: rafaelurben.ch/ffhs/ta2/impl1-mongodb:latest
+    build:
+      context: impl1-mongodb
+    container_name: impl1mongodb
+    environment:
+      MONGODB_URL: mongodb://user:password@host.docker.internal:27017/objectdb?authSource=admin
+      MONGODB_DATABASE: objectdb
+    restart: on-failure
+    ports:
+      - "8181:8181"
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+  # Implementation 2
+  impl2_kurrentdb:
+    image: rafaelurben.ch/ffhs/ta2/impl2-kurrentdb:latest
+    build:
+      context: impl2-kurrentdb
+    container_name: impl2kurrentdb
+    environment:
+      KURRENTDB_URL: kurrentdb://admin:changeit@host.docker.internal:2113?tls=false&tlsVerifyCert=false
+    restart: on-failure
+    ports:
+      - "8182:8182"
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
