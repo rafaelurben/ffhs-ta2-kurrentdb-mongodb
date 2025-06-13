@@ -51,3 +51,15 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 | MongoDB admin (mongo-express)          | [27018](http://localhost:27018) |
 | API Implementation 2 (KurrentDB)       | 8182                            |
 | KurrentDB database (incl. embedded UI) | [2113](http://localhost:2113)   |
+
+
+## Uninstallation / Cleanup
+
+1. To stop and remove the implementation Docker containers, run:
+    ```bash
+    docker compose -f docker-compose-testing.yaml down
+    ```
+2. To stop and remove the infrastructure Docker containers including volumes, run:
+    ```bash
+    docker compose down --volumes
+    ```
