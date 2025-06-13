@@ -8,6 +8,7 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 - Docker
 - Java 21
 - Maven
+- Python 3.12+ (optional, for analyzing the results)
 
 ## Installation
 
@@ -31,6 +32,14 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 5. Run the tests:
     ```bash
     mvn -f testing-client/pom.xml clean compile exec:java
+    ```
+6. (Optional) Install the Python dependencies:
+    ```bash
+    python -m pip install -r stats/requirements.txt
+    ```
+7. (Optional) Analyze the results:
+    ```bash
+    python stats/analyze.py
     ```
 
 ## Ports and services
