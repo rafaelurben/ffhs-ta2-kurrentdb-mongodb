@@ -72,7 +72,7 @@ services:
       context: impl1-mongodb
     container_name: impl1mongodb
     environment:
-      MONGODB_URL: mongodb://user:password@host.docker.internal:27017/objectdb?authSource=admin
+      MONGODB_URL: mongodb://user:password@mongodb:27017/objectdb?authSource=admin
       MONGODB_DATABASE: objectdb
     restart: on-failure
     ports:
@@ -100,7 +100,7 @@ services:
       context: impl2-kurrentdb
     container_name: impl2kurrentdb
     environment:
-      KURRENTDB_URL: kurrentdb://admin:changeit@host.docker.internal:2113?tls=false&tlsVerifyCert=false
+      KURRENTDB_URL: kurrentdb://admin:changeit@kurrentdb:2113?tls=false&tlsVerifyCert=false
     restart: on-failure
     ports:
       - "8182:8182"

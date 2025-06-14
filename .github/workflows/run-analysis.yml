@@ -23,20 +23,20 @@ jobs:
 
       - id: docker-compose
         name: Build and start docker containers and wait for them to be ready
-        run: docker compose -f docker-compose.yaml --profile "*" up -d --wait --build
+        run: docker compose -f docker-compose.yaml --profile "*" up -d --wait --build --quiet-pull
 
       - name: (On failure) Log docker container status
         if: failure() && steps.docker-compose.conclusion == 'failure'
         run: |
-          # Run docker compose ps to show the status of all containers
+          echo "Docker container status:"
           docker compose -f docker-compose.yaml --profile "*" ps --all
-          # Inspect the health status impl1mongodb
+          echo "Health status of impl1mongodb"
           docker inspect --format "{{json .State.Health }}" impl1mongodb
-          # Inspect the health status impl2kurrentdb
+          echo "Health status of impl2kurrentdb"
           docker inspect --format "{{json .State.Health }}" impl2kurrentdb
-          # Log the last 100 lines of impl1mongodb
+          echo "Logs from impl1mongodb"
           docker logs impl1mongodb --tail 100
-          # Log the last 100 lines of impl2kurrentdb
+          echo "Logs from impl2kurrentdb"
           docker logs impl2kurrentdb --tail 100
 
       - name: Run tests
