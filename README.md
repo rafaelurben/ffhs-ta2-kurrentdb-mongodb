@@ -19,7 +19,7 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
     ```
 2. Start the infrastructure docker containers:
     ```bash
-    docker compose -f docker-compose-infrastructure.yaml up -d
+    docker compose -f docker-compose.yaml up -d --wait
     ```
 3. Generate, compile and package the Java projects:
     ```bash
@@ -27,7 +27,7 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
     ```
 4. Start the API implementations in docker containers for resource isolation:
     ```bash
-    docker compose -f docker-compose-implementations.yaml up -d --build
+    docker compose -f docker-compose.yaml --profile implementations up -d --build --wait
     ```
 5. Run the tests:
     ```bash
@@ -57,9 +57,9 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 
 1. To stop and remove the implementation Docker containers, run:
     ```bash
-    docker compose -f docker-compose-implementations.yaml down
+    docker compose -f docker-compose.yaml --profile implementations down
     ```
 2. To stop and remove the infrastructure Docker containers including volumes, run:
     ```bash
-    docker compose -f docker-compose-infrastructure.yaml down --volumes
+    docker compose -f docker-compose.yaml down --volumes
     ```

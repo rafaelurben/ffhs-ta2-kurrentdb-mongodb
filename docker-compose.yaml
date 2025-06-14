@@ -1,0 +1,126 @@
+name: ffhs-ta2
+services:
+  # MongoDB Database
+  mongodb_database:
+    image: mongo:8.0.9
+    container_name: mongodb
+    restart: on-failure
+    ports:
+      - "27017:27017"
+    volumes:
+      - type: volume
+        source: mongodb-volume-data
+        target: /data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+    healthcheck:
+      test: [ "CMD", "mongosh", "--username", "user", "--password", "password", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+  # MongoDB Admin Interface
+  mongodb_admin:
+    image: mongo-express:1.0.2-20-alpine3.19
+    container_name: mongo-express
+    restart: on-failure
+    ports:
+      - "27018:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_URL: mongodb://user:password@mongodb:27017/
+      ME_CONFIG_BASICAUTH: false
+  # KurrentDB Database
+  kurrentdb:
+    # https://cloudsmith.io/~eventstore/repos/kurrent-latest/packages/?q=format%3Adocker+name%3Akurrentdb
+    image: docker.kurrent.io/kurrent-latest/kurrentdb:25.0.1
+    container_name: kurrentdb
+    environment:
+      - KURRENTDB_CLUSTER_SIZE=1
+      - KURRENTDB_RUN_PROJECTIONS=All
+      - KURRENTDB_START_STANDARD_PROJECTIONS=true
+      - KURRENTDB_NODE_PORT=2113
+      - KURRENTDB_INSECURE=true
+      - KURRENTDB_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - "2113:2113"
+    volumes:
+      - type: volume
+        source: kurrentdb-volume-data
+        target: /var/lib/kurrentdb
+      - type: volume
+        source: kurrentdb-volume-logs
+        target: /var/log/kurrentdb
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+  # Implementation 1 (MongoDB)
+  impl1_mongodb:
+    image: rafaelurben.ch/ffhs/ta2/impl1-mongodb:latest
+    build:
+      context: impl1-mongodb
+    container_name: impl1mongodb
+    environment:
+      MONGODB_URL: mongodb://user:password@host.docker.internal:27017/objectdb?authSource=admin
+      MONGODB_DATABASE: objectdb
+    restart: on-failure
+    ports:
+      - "8181:8181"
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+    depends_on:
+      mongodb_database:
+        condition: service_healthy
+    healthcheck:
+      test: wget --spider -q http://localhost:8181/api/v1/status || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    profiles: ["implementations"]
+  # Implementation 2 (KurrentDB)
+  impl2_kurrentdb:
+    image: rafaelurben.ch/ffhs/ta2/impl2-kurrentdb:latest
+    build:
+      context: impl2-kurrentdb
+    container_name: impl2kurrentdb
+    environment:
+      KURRENTDB_URL: kurrentdb://admin:changeit@host.docker.internal:2113?tls=false&tlsVerifyCert=false
+    restart: on-failure
+    ports:
+      - "8182:8182"
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+    depends_on:
+      kurrentdb:
+        condition: service_healthy
+    healthcheck:
+      test: wget --spider -q http://localhost:8182/api/v1/status || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    profiles: ["implementations"]
+volumes:
+  mongodb-volume-data:
+  kurrentdb-volume-data:
+  kurrentdb-volume-logs:
