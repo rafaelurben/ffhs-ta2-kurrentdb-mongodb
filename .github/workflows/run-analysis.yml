@@ -21,8 +21,16 @@ jobs:
       - name: Build with Maven
         run: mvn compile package --batch-mode --no-transfer-progress
 
-      - name: Build and start docker containers and wait for them to be ready
+      - id: docker-compose
+        name: Build and start docker containers and wait for them to be ready
         run: docker compose -f docker-compose.yaml --profile "*" up -d --wait --build
+
+      - name: (On failure) Log docker container status
+        if: failure() && steps.docker-compose.conclusion == 'failure'
+        run: |
+          docker compose -f docker-compose.yaml --profile "*" ps --all
+          docker inspect --format "{{json .State.Health }}" impl1mongodb
+          docker inspect --format "{{json .State.Health }}" impl2kurrentdb
 
       - name: Run tests
         run: mvn -f testing-client/pom.xml clean compile exec:java
