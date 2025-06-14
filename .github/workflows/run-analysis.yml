@@ -1,0 +1,49 @@
+name: Run full analysis
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn compile package --batch-mode --no-transfer-progress
+
+      - name: Build and start docker containers and wait for them to be ready
+        run: docker compose -f docker-compose.yaml --profile "*" up -d --wait --build
+
+      - name: Run tests
+        run: mvn -f testing-client/pom.xml clean compile exec:java
+
+      - name: Stop and remove docker containers and volumes
+        run: docker compose -f docker-compose.yaml --profile "*" down --volumes
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: python -m pip install -r stats/requirements.txt
+
+      - name: Run analysis
+        run: python stats/analyze.py
+
+      - name: Upload analysis results
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-results
+          path: stats/results
