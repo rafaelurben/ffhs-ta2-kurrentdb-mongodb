@@ -17,17 +17,17 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
     git clone https://github.com/rafaelurben/ffhs-ta2-kurrentdb-mongodb.git
     cd ffhs-ta2-kurrentdb-mongodb
     ```
-2. Run the infrastructure Docker containers:
+2. Start the infrastructure docker containers:
     ```bash
-    docker compose up -d
+    docker compose -f docker-compose-infrastructure.yaml up -d
     ```
-3. Compile and package the Java projects:
+3. Generate, compile and package the Java projects:
     ```bash
     mvn clean compile package
     ```
 4. Start the API implementations in docker containers for resource isolation:
     ```bash
-    docker compose -f docker-compose-testing.yaml up -d --build
+    docker compose -f docker-compose-implementations.yaml up -d --build
     ```
 5. Run the tests:
     ```bash
@@ -57,9 +57,9 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 
 1. To stop and remove the implementation Docker containers, run:
     ```bash
-    docker compose -f docker-compose-testing.yaml down
+    docker compose -f docker-compose-implementations.yaml down
     ```
 2. To stop and remove the infrastructure Docker containers including volumes, run:
     ```bash
-    docker compose down --volumes
+    docker compose -f docker-compose-infrastructure.yaml down --volumes
     ```
