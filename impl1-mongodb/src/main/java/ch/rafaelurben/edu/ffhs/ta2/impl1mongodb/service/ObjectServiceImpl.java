@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +75,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public ParentObjectDto createParentObject(ParentObjectCreateDto parentObjectCreateDto) {
     ParentObject parentObject = parentObjectMapper.toEntity(parentObjectCreateDto);
     parentObject = objectRepository.save(parentObject);
@@ -93,6 +95,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public ParentObjectDto updateParentObject(
       String parentId, ParentObjectUpdateDto parentObjectUpdateDto)
       throws ResourceNotFoundException {
@@ -110,6 +113,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public void deleteParentObject(String parentId) throws ResourceNotFoundException {
     ParentObject parentObject = getParentObject(parentId);
     objectRepository.delete(parentObject);
@@ -120,6 +124,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public ChildObjectDto createChildObject(
       String parentId, ChildObjectCreateDto childObjectCreateDto) throws ResourceNotFoundException {
     ParentObject parentObject = getParentObject(parentId);
@@ -149,6 +154,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public ChildObjectDto updateChildObjectById(
       String parentId, String childId, ChildObjectUpdateDto childObjectUpdateDto)
       throws ResourceNotFoundException {
@@ -169,6 +175,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public void deleteChildObjectById(String parentId, String childId)
       throws ResourceNotFoundException {
     ParentObject parentObject = getParentObject(parentId);
@@ -200,6 +207,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
+  @Transactional
   public ParentObjectDto restoreParentToHistoryEntry(String parentId, String historyId)
       throws ResourceNotFoundException, ImpossibleHistoryException {
     ParentObjectHistory history = getParentObjectHistory(parentId);
