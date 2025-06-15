@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/de/deployment-diagram
+
+node "Host Machine" as hostMachine {
+  node "Testing Client" as testingClient
+  node "Docker" {
+    database "MongoDB Database" as mongodb
+    node "MongoDB Admin Interface" as mongoExpress
+    database "KurrentDB Database" as kurrentdb
+    node "Implementation 1 (MongoDB)" as impl1mongodb
+    node "Implementation 2 (KurrentDB)" as impl2kurrentdb
+  }
+}
+
+testingClient --> impl1mongodb : 8181
+testingClient --> impl2kurrentdb : 8182
+
+mongoExpress --> mongodb : 27017
+
+impl1mongodb --> mongodb : 27017
+impl2kurrentdb --> kurrentdb : 2113
+
+@enduml
+

@@ -1,0 +1,48 @@
+@startuml
+
+' Define the root node
+package "/" {
+    [pom.xml]
+}
+
+' Group for API Specs
+package "/specs/" {
+    [specs/pom.xml]
+
+    package "target/generated-projects/" {
+        [server-stub] #lightgreen
+        [api-client] #lightgreen
+    }
+
+    [specs/pom.xml] -[#green]--> [server-stub] : generates
+    [specs/pom.xml] -[#green]--> [api-client] : generates
+}
+
+' Implementation 1 (MongoDB)
+package "/impl1-mongodb/" {
+    [impl1-mongodb]
+}
+
+' Implementation 2 (KurrentDB)
+package "/impl2-kurrentdb/" {
+    [impl2-kurrentdb]
+}
+
+' Testing client
+package "/testing-client/" {
+    [testing-client]
+}
+
+' Parent-child pom hierarchy
+[pom.xml] <-> [specs/pom.xml] : parent / child
+[pom.xml] <-> [impl1-mongodb] : parent / child
+[pom.xml] <-> [impl2-kurrentdb] : parent / child
+[pom.xml] <-> [testing-client] : parent / child
+
+' Service dependencies on generated stubs
+[impl1-mongodb] --> [server-stub] : uses
+[impl2-kurrentdb] --> [server-stub] : uses
+[testing-client] --> [api-client] : uses
+
+@enduml
+
