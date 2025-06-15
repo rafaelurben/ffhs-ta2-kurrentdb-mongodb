@@ -21,6 +21,21 @@ def ns_to_ms(df):
     return df
 
 
+def smooth_outliers(series, threshold=1.0):
+    """
+    Smooth outliers in a pandas Series using a rolling median and threshold.
+    Outliers are replaced with the rolling median if they deviate by more than threshold * std.
+    """
+    window_size = min(50, len(series) // 10)  # Use a window size of 10% of the series length, up to 50
+    rolling_median = series.rolling(window_size, center=True, min_periods=1).median()
+    rolling_std = series.rolling(window_size, center=True, min_periods=1).std().fillna(0)
+    diff = (series - rolling_median).abs()
+    mask = diff > (threshold * rolling_std)
+    smoothed = series.copy()
+    smoothed[mask] = rolling_median[mask]
+    return smoothed
+
+
 def plot_pair(filepath1: Path, filepath2: Path, result_path: Path, test_name: str):
     df1 = pd.read_csv(filepath1)
     df2 = pd.read_csv(filepath2)
@@ -42,7 +57,8 @@ def plot_pair(filepath1: Path, filepath2: Path, result_path: Path, test_name: st
 
         for col in df1.columns:
             if '(ms)' in col:
-                main_plot_axes.plot(df.index, df[col], label=col)
+                smoothed = smooth_outliers(df[col])
+                main_plot_axes.plot(df.index, smoothed, label=col + ' (smoothed)')
             if '(events)' in col:
                 count_plot_axes.plot(df.index, df[col], label=col, color='red')
 
