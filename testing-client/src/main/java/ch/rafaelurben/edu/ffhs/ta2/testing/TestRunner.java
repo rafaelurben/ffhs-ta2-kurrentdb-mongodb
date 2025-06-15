@@ -8,6 +8,7 @@ import ch.rafaelurben.edu.ffhs.ta2.client.ApiClient;
 import ch.rafaelurben.edu.ffhs.ta2.client.ApiException;
 import ch.rafaelurben.edu.ffhs.ta2.testing.functionality.Example1Test;
 import ch.rafaelurben.edu.ffhs.ta2.testing.functionality.Example2Test;
+import ch.rafaelurben.edu.ffhs.ta2.testing.functionality.RestoreDeletedTest;
 import ch.rafaelurben.edu.ffhs.ta2.testing.functionality.StatusTest;
 import ch.rafaelurben.edu.ffhs.ta2.testing.performance.ManyChildrenTest;
 import ch.rafaelurben.edu.ffhs.ta2.testing.performance.ManyParentsTest;
@@ -31,6 +32,9 @@ public class TestRunner {
 
       log.info("Running example 2 tests for {}", label);
       Example2Test.test(client);
+
+      log.info("Running RestoreDeleted test for {}", label);
+      RestoreDeletedTest.test(client);
 
       log.info("ALL TESTS PASSED for {}", label);
     } catch (ApiException | AssertionError e) {
