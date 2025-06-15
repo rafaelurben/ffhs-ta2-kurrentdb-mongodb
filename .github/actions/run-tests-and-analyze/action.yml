@@ -1,0 +1,36 @@
+name: 'Run tests and analyze'
+inputs:
+  suffix:
+    description: 'Suffix for uploaded artifacts'
+    required: true
+outputs:
+  test-data-url:
+    description: "Artifact URL for the test data"
+    value: ${{ steps.upload-test-data.outputs.artifact-url }}
+  analysis-results-url:
+    description: "Artifact URL for the analysis results"
+    value: ${{ steps.upload-analysis-results.outputs.artifact-url }}
+runs:
+  using: "composite"
+  steps:
+    - name: Run tests
+      run: mvn -f testing-client/pom.xml clean compile exec:java
+      shell: bash
+
+    - id: upload-test-data
+      name: Upload test data
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-data-${{ inputs.suffix }}
+        path: stats/data
+
+    - name: Run analysis
+      run: python stats/analyze.py
+      shell: bash
+
+    - id: upload-analysis-results
+      name: Upload analysis results
+      uses: actions/upload-artifact@v4
+      with:
+        name: analysis-results-${{ inputs.suffix }}
+        path: stats/results

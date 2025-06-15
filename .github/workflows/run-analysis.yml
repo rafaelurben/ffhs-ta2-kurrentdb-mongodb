@@ -1,7 +1,17 @@
 name: Run full analysis
 
 on:
-  workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch:
+    inputs:
+      test_runs:
+        description: 'Number of times to run tests'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - "1"
+          - "2"
+          - "3"
 
 jobs:
   analyze:
@@ -39,18 +49,6 @@ jobs:
           echo "Logs from impl2kurrentdb"
           docker logs impl2kurrentdb --tail 100
 
-      - name: Run tests
-        run: mvn -f testing-client/pom.xml clean compile exec:java
-
-      - name: Stop and remove docker containers and volumes
-        run: docker compose -f docker-compose.yaml --profile "*" down --volumes
-
-      - name: Upload test data
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-data
-          path: stats/data
-
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
@@ -60,11 +58,22 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install -r stats/requirements.txt
 
-      - name: Run analysis
-        run: python stats/analyze.py
-
-      - name: Upload analysis results
-        uses: actions/upload-artifact@v4
+      - name: Run tests and upload test data (1)
+        uses: ./.github/actions/run-tests-and-analyze
         with:
-          name: analysis-results
-          path: stats/results
+          suffix: '1'
+
+      - name: Run tests and upload test data (2)
+        uses: ./.github/actions/run-tests-and-analyze
+        with:
+          suffix: '2'
+        if: ${{ github.event.inputs.test_runs == '2' || github.event.inputs.test_runs == '3' }}
+
+      - name: Run tests and upload test data (3)
+        uses: ./.github/actions/run-tests-and-analyze
+        with:
+          suffix: '3'
+        if: ${{ github.event.inputs.test_runs == '3' }}
+
+      - name: Stop and remove docker containers and volumes
+        run: docker compose -f docker-compose.yaml --profile "*" down --volumes
