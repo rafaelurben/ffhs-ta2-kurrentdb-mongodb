@@ -25,13 +25,14 @@ public class ObjectServiceImpl implements ObjectService {
   private final ProjectionService projectionService;
   private final AggregateService aggregateService;
 
-  private ParentObjectDto getParentObject(String parentId) throws ResourceNotFoundException {
+  private ParentObjectDto getParentObjectFromStream(String parentId)
+      throws ResourceNotFoundException {
     List<EventBase> events = streamService.readObjectStream(parentId);
-    ParentObjectDto parent = aggregateService.constructParentFromEvents(events);
-    if (parent == null) {
+    ParentObjectDto parentObject = aggregateService.constructParentFromEvents(events);
+    if (parentObject == null) {
       throw new ResourceNotFoundException("Parent object already deleted");
     }
-    return parent;
+    return parentObject;
   }
 
   private ParentObjectDto getParentObjectFromProjection(String parentId)
@@ -65,7 +66,7 @@ public class ObjectServiceImpl implements ObjectService {
 
     // Create and store event
     EventBase event = ParentCreatedEvent.builder().createData(parentObject).build();
-    streamService.storeEvent(parentId, event);
+    streamService.appendEvent(parentId, event, StreamService.expectNoStream());
 
     return parentObject;
   }
@@ -79,29 +80,29 @@ public class ObjectServiceImpl implements ObjectService {
   public ParentObjectDto updateParentObject(
       String parentId, ParentObjectUpdateDto parentObjectUpdateDto)
       throws ResourceNotFoundException {
-    ParentObjectDto parentObject = getParentObject(parentId);
+    ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     parentObjectMapper.updateDto(parentObject, parentObjectUpdateDto);
 
     // Create and store event
     EventBase event = ParentUpdatedEvent.builder().changeData(parentObjectUpdateDto).build();
-    streamService.storeEvent(parentId, event);
+    streamService.appendEvent(parentId, event);
 
     return parentObject;
   }
 
   @Override
   public void deleteParentObject(String parentId) throws ResourceNotFoundException {
-    getParentObject(parentId);
+    getParentObjectFromStream(parentId);
 
     // Create and store event
     EventBase event = ParentDeletedEvent.builder().build();
-    streamService.storeEvent(parentId, event);
+    streamService.appendEvent(parentId, event);
   }
 
   @Override
   public ChildObjectDto createChildObject(
       String parentId, ChildObjectCreateDto childObjectCreateDto) throws ResourceNotFoundException {
-    ParentObjectDto parentObject = getParentObject(parentId);
+    ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     ChildObjectDto childObject = childObjectMapper.toDto(childObjectCreateDto);
     childObject.setId(UUID.randomUUID().toString());
     parentObject.getChildren().add(childObject);
@@ -109,7 +110,7 @@ public class ObjectServiceImpl implements ObjectService {
     // Create and store event
     EventBase childCreatedEvent =
         ChildCreatedEvent.builder().childId(childObject.getId()).createData(childObject).build();
-    streamService.storeEvent(parentId, childCreatedEvent);
+    streamService.appendEvent(parentId, childCreatedEvent);
 
     return childObject;
   }
@@ -125,7 +126,7 @@ public class ObjectServiceImpl implements ObjectService {
   public ChildObjectDto updateChildObjectById(
       String parentId, String childId, ChildObjectUpdateDto childObjectUpdateDto)
       throws ResourceNotFoundException {
-    ParentObjectDto parentObject = getParentObject(parentId);
+    ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     ChildObjectDto childObject = getChildObject(parentObject, childId);
     childObjectMapper.updateDto(childObject, childObjectUpdateDto);
 
@@ -135,7 +136,7 @@ public class ObjectServiceImpl implements ObjectService {
             .childId(childObject.getId())
             .changeData(childObjectUpdateDto)
             .build();
-    streamService.storeEvent(parentId, childUpdatedEvent);
+    streamService.appendEvent(parentId, childUpdatedEvent);
 
     return childObject;
   }
@@ -143,13 +144,13 @@ public class ObjectServiceImpl implements ObjectService {
   @Override
   public void deleteChildObjectById(String parentId, String childId)
       throws ResourceNotFoundException {
-    ParentObjectDto parentObject = getParentObject(parentId);
+    ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     ChildObjectDto childObject = getChildObject(parentObject, childId);
     parentObject.getChildren().remove(childObject);
 
     // Create and store event
     EventBase childDeletedEvent = ChildDeletedEvent.builder().childId(childObject.getId()).build();
-    streamService.storeEvent(parentId, childDeletedEvent);
+    streamService.appendEvent(parentId, childDeletedEvent);
   }
 
   @Override
@@ -173,9 +174,7 @@ public class ObjectServiceImpl implements ObjectService {
     ParentObjectDto result =
         aggregateService.restoreParentToHistoryEntry(
             streamService.readObjectStream(parentId), historyId, newEvents);
-    for (EventBase event : newEvents) {
-      streamService.storeEvent(parentId, event);
-    }
+    streamService.appendEvents(parentId, newEvents);
     return result;
   }
 }
