@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  build:
+  analyze:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,6 +44,12 @@ jobs:
 
       - name: Stop and remove docker containers and volumes
         run: docker compose -f docker-compose.yaml --profile "*" down --volumes
+
+      - name: Upload test data
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-data
+          path: stats/data
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
