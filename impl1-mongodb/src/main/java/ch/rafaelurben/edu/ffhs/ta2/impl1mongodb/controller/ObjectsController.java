@@ -8,6 +8,7 @@ import ch.rafaelurben.edu.ffhs.ta2.server.model.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,77 +34,56 @@ public class ObjectsController implements ObjectsApi {
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ParentObjectDto> getParent(String parentId) {
-    try {
-      ParentObjectDto parentObject = objectService.getParentObjectById(parentId);
-      return new ResponseEntity<>(parentObject, HttpStatus.OK);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    ParentObjectDto parentObject = objectService.getParentObjectById(parentId);
+    return new ResponseEntity<>(parentObject, HttpStatus.OK);
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ParentObjectDto> updateParent(
       String parentId, @Valid ParentObjectUpdateDto parentObjectUpdateDto) {
-    try {
-      ParentObjectDto updatedObject =
-          objectService.updateParentObject(parentId, parentObjectUpdateDto);
-      return new ResponseEntity<>(updatedObject, HttpStatus.OK);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    ParentObjectDto updatedObject =
+        objectService.updateParentObject(parentId, parentObjectUpdateDto);
+    return new ResponseEntity<>(updatedObject, HttpStatus.OK);
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<Void> deleteParent(String parentId) {
-    try {
-      objectService.deleteParentObject(parentId);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    objectService.deleteParentObject(parentId);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ChildObjectDto> createChild(
       String parentId, @Valid ChildObjectCreateDto childObjectCreateDto) {
-    try {
-      ChildObjectDto createdChild = objectService.createChildObject(parentId, childObjectCreateDto);
-      return new ResponseEntity<>(createdChild, HttpStatus.CREATED);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    ChildObjectDto createdChild = objectService.createChildObject(parentId, childObjectCreateDto);
+    return new ResponseEntity<>(createdChild, HttpStatus.CREATED);
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ChildObjectDto> getChild(String parentId, String childId) {
-    try {
-      ChildObjectDto childObject = objectService.getChildObjectById(parentId, childId);
-      return new ResponseEntity<>(childObject, HttpStatus.OK);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    ChildObjectDto childObject = objectService.getChildObjectById(parentId, childId);
+    return new ResponseEntity<>(childObject, HttpStatus.OK);
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ChildObjectDto> updateChild(
       String parentId, String childId, @Valid ChildObjectUpdateDto childObjectUpdateDto) {
-    try {
-      ChildObjectDto updatedChild =
-          objectService.updateChildObjectById(parentId, childId, childObjectUpdateDto);
-      return new ResponseEntity<>(updatedChild, HttpStatus.OK);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    ChildObjectDto updatedChild =
+        objectService.updateChildObjectById(parentId, childId, childObjectUpdateDto);
+    return new ResponseEntity<>(updatedChild, HttpStatus.OK);
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<Void> deleteChild(String parentId, String childId) {
-    try {
-      objectService.deleteChildObjectById(parentId, childId);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (ResourceNotFoundException e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    objectService.deleteChildObjectById(parentId, childId);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }
