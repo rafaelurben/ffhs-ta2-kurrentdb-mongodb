@@ -1,8 +1,6 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.controller;
 
-import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ImpossibleHistoryException;
-import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service.ObjectService;
 import ch.rafaelurben.edu.ffhs.ta2.server.api.ObjectsApi;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.*;
@@ -12,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -20,16 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/v1")
 public class ObjectsController implements ObjectsApi {
   private final ObjectService objectService;
-
-  @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException e) {
-    return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(ImpossibleHistoryException.class)
-  public ResponseEntity<String> handleImpossibleHistory(ImpossibleHistoryException e) {
-    return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-  }
 
   @Override
   public ResponseEntity<ParentObjectDto> createParent(
