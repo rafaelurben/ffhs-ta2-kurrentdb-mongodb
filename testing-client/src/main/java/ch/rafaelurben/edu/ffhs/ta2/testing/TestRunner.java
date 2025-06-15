@@ -11,6 +11,7 @@ import ch.rafaelurben.edu.ffhs.ta2.testing.functionality.Example2Test;
 import ch.rafaelurben.edu.ffhs.ta2.testing.functionality.StatusTest;
 import ch.rafaelurben.edu.ffhs.ta2.testing.performance.ManyChildrenTest;
 import ch.rafaelurben.edu.ffhs.ta2.testing.performance.ManyParentsTest;
+import ch.rafaelurben.edu.ffhs.ta2.testing.performance.ManyRestoresTest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -57,6 +58,12 @@ public class TestRunner {
       log.info("Running ManyParents performance test for {}", label);
       var resultManyParents = ManyParentsTest.run(client);
       exportMetricsToCsv("ManyParents - " + label, resultManyParents);
+
+      sleep(500); // Ensure some delay between tests
+
+      log.info("Running ManyRestores performance test for {}", label);
+      var resultManyRestores = ManyRestoresTest.run(client);
+      exportMetricsToCsv("ManyRestores - " + label, resultManyRestores);
 
       log.info("PERFORMANCE TESTS COMPLETED for {}", label);
     } catch (ApiException | AssertionError e) {

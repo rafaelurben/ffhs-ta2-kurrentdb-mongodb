@@ -8,7 +8,8 @@ RESULTS_DIR = Path(__file__).parent / 'results'
 
 PAIR_NAMES = [
     ('ManyParents - Implementation 1 (MongoDB).csv', 'ManyParents - Implementation 2 (KurrentDB).csv'),
-    ('ManyChildren - Implementation 1 (MongoDB).csv', 'ManyChildren - Implementation 2 (KurrentDB).csv')
+    ('ManyChildren - Implementation 1 (MongoDB).csv', 'ManyChildren - Implementation 2 (KurrentDB).csv'),
+    ('ManyRestores - Implementation 1 (MongoDB).csv', 'ManyRestores - Implementation 2 (KurrentDB).csv')
 ]
 
 
@@ -26,7 +27,7 @@ def smooth_outliers(series, threshold=1.0):
     Smooth outliers in a pandas Series using a rolling median and threshold.
     Outliers are replaced with the rolling median if they deviate by more than threshold * std.
     """
-    window_size = min(50, len(series) // 10)  # Use a window size of 10% of the series length, up to 50
+    window_size = max(1, min(50, len(series) // 10))  # Use a window size of 1 <= 10% of the series length <= 50
     rolling_median = series.rolling(window_size, center=True, min_periods=1).median()
     rolling_std = series.rolling(window_size, center=True, min_periods=1).std().fillna(0)
     diff = (series - rolling_median).abs()
