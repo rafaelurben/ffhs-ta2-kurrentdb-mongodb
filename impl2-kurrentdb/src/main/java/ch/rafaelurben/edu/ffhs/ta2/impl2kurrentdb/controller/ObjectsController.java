@@ -1,12 +1,15 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.controller;
 
+import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ImpossibleHistoryException;
+import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service.ObjectService;
 import ch.rafaelurben.edu.ffhs.ta2.server.api.ObjectsApi;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,12 +35,14 @@ public class ObjectsController implements ObjectsApi {
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ParentObjectDto> getParent(String parentId) {
     ParentObjectDto parentObject = objectService.getParentObjectById(parentId);
     return new ResponseEntity<>(parentObject, HttpStatus.OK);
   }
 
   @Override
+  @SneakyThrows({ResourceNotFoundException.class, ImpossibleHistoryException.class})
   public ResponseEntity<ParentObjectDto> updateParent(
       String parentId, @Valid ParentObjectUpdateDto parentObjectUpdateDto) {
     ParentObjectDto updatedObject =
@@ -46,12 +51,14 @@ public class ObjectsController implements ObjectsApi {
   }
 
   @Override
+  @SneakyThrows({ResourceNotFoundException.class, ImpossibleHistoryException.class})
   public ResponseEntity<Void> deleteParent(String parentId) {
     objectService.deleteParentObject(parentId);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Override
+  @SneakyThrows({ResourceNotFoundException.class, ImpossibleHistoryException.class})
   public ResponseEntity<ChildObjectDto> createChild(
       String parentId, @Valid ChildObjectCreateDto childObjectCreateDto) {
     ChildObjectDto createdChild = objectService.createChildObject(parentId, childObjectCreateDto);
@@ -59,12 +66,14 @@ public class ObjectsController implements ObjectsApi {
   }
 
   @Override
+  @SneakyThrows(ResourceNotFoundException.class)
   public ResponseEntity<ChildObjectDto> getChild(String parentId, String childId) {
     ChildObjectDto childObject = objectService.getChildObjectById(parentId, childId);
     return new ResponseEntity<>(childObject, HttpStatus.OK);
   }
 
   @Override
+  @SneakyThrows({ResourceNotFoundException.class, ImpossibleHistoryException.class})
   public ResponseEntity<ChildObjectDto> updateChild(
       String parentId, String childId, @Valid ChildObjectUpdateDto childObjectUpdateDto) {
     ChildObjectDto updatedChild =
@@ -73,6 +82,7 @@ public class ObjectsController implements ObjectsApi {
   }
 
   @Override
+  @SneakyThrows({ResourceNotFoundException.class, ImpossibleHistoryException.class})
   public ResponseEntity<Void> deleteChild(String parentId, String childId) {
     objectService.deleteChildObjectById(parentId, childId);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

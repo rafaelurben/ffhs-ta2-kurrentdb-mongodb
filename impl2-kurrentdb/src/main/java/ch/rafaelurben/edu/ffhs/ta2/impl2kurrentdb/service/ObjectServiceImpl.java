@@ -1,6 +1,7 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service;
 
+import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ImpossibleHistoryException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.mapper.ChildObjectMapper;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.mapper.EventMapper;
@@ -26,7 +27,7 @@ public class ObjectServiceImpl implements ObjectService {
   private final AggregateService aggregateService;
 
   private ParentObjectDto getParentObjectFromStream(String parentId)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     List<EventBase> events = streamService.readObjectStream(parentId);
     ParentObjectDto parentObject = aggregateService.constructParentFromEvents(events);
     if (parentObject == null) {
@@ -58,8 +59,7 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
-  public ParentObjectDto createParentObject(ParentObjectCreateDto parentObjectCreateDto)
-      throws ResourceNotFoundException {
+  public ParentObjectDto createParentObject(ParentObjectCreateDto parentObjectCreateDto) {
     String parentId = UUID.randomUUID().toString();
     ParentObjectDto parentObject = parentObjectMapper.toDto(parentObjectCreateDto);
     parentObject.setId(parentId);
@@ -79,7 +79,7 @@ public class ObjectServiceImpl implements ObjectService {
   @Override
   public ParentObjectDto updateParentObject(
       String parentId, ParentObjectUpdateDto parentObjectUpdateDto)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     parentObjectMapper.updateDto(parentObject, parentObjectUpdateDto);
 
@@ -91,7 +91,8 @@ public class ObjectServiceImpl implements ObjectService {
   }
 
   @Override
-  public void deleteParentObject(String parentId) throws ResourceNotFoundException {
+  public void deleteParentObject(String parentId)
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     getParentObjectFromStream(parentId);
 
     // Create and store event
@@ -101,7 +102,8 @@ public class ObjectServiceImpl implements ObjectService {
 
   @Override
   public ChildObjectDto createChildObject(
-      String parentId, ChildObjectCreateDto childObjectCreateDto) throws ResourceNotFoundException {
+      String parentId, ChildObjectCreateDto childObjectCreateDto)
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     ChildObjectDto childObject = childObjectMapper.toDto(childObjectCreateDto);
     childObject.setId(UUID.randomUUID().toString());
@@ -125,7 +127,7 @@ public class ObjectServiceImpl implements ObjectService {
   @Override
   public ChildObjectDto updateChildObjectById(
       String parentId, String childId, ChildObjectUpdateDto childObjectUpdateDto)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     ChildObjectDto childObject = getChildObject(parentObject, childId);
     childObjectMapper.updateDto(childObject, childObjectUpdateDto);
@@ -143,7 +145,7 @@ public class ObjectServiceImpl implements ObjectService {
 
   @Override
   public void deleteChildObjectById(String parentId, String childId)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     ParentObjectDto parentObject = getParentObjectFromStream(parentId);
     ChildObjectDto childObject = getChildObject(parentObject, childId);
     parentObject.getChildren().remove(childObject);
@@ -162,14 +164,14 @@ public class ObjectServiceImpl implements ObjectService {
 
   @Override
   public ParentObjectDto previewParentAtHistoryEntry(String parentId, String historyId)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     return aggregateService.constructParentFromEventsUpToHistoryId(
         streamService.readObjectStream(parentId), historyId);
   }
 
   @Override
   public ParentObjectDto restoreParentToHistoryEntry(String parentId, String historyId)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, ImpossibleHistoryException {
     List<EventBase> newEvents = new ArrayList<>();
     ParentObjectDto result =
         aggregateService.restoreParentToHistoryEntry(

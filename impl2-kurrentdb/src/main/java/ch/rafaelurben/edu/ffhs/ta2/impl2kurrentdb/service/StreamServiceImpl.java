@@ -2,7 +2,6 @@
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service;
 
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.config.KurrentDBConfig;
-import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ImpossibleHistoryException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.KurrentException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.model.events.EventBase;
@@ -36,8 +35,7 @@ public class StreamServiceImpl implements StreamService {
   }
 
   @Override
-  public List<EventBase> readObjectStream(String parentId)
-      throws ResourceNotFoundException, ImpossibleHistoryException {
+  public List<EventBase> readObjectStream(String parentId) throws ResourceNotFoundException {
     ReadResult readResult;
     try {
       readResult =
@@ -52,7 +50,7 @@ public class StreamServiceImpl implements StreamService {
       if (e.getCause() instanceof StreamNotFoundException) {
         throw new ResourceNotFoundException("Parent object with ID " + parentId + " not found.");
       }
-      throw new KurrentException(e);
+      throw new KurrentException("Failed to read from stream", e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new KurrentException("Interrupted while reading stream for parent ID " + parentId, e);
