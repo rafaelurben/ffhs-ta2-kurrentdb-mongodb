@@ -1,7 +1,6 @@
 /* (C) 2025 - Rafael Urben */
 package ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.controller;
 
-import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.exceptions.ResourceNotFoundException;
 import ch.rafaelurben.edu.ffhs.ta2.impl2kurrentdb.service.ObjectService;
 import ch.rafaelurben.edu.ffhs.ta2.server.api.ObjectHistoryApi;
 import ch.rafaelurben.edu.ffhs.ta2.server.model.HistoryEntryDto;
@@ -20,34 +19,21 @@ public class ObjectHistoryController implements ObjectHistoryApi {
 
   @Override
   public ResponseEntity<List<HistoryEntryDto>> getEntriesByParentId(String parentId) {
-    try {
-      List<HistoryEntryDto> historyEntries = objectService.getAllHistoryEntriesByParentId(parentId);
-      return ResponseEntity.ok(historyEntries);
-    } catch (ResourceNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+    List<HistoryEntryDto> historyEntries = objectService.getAllHistoryEntriesByParentId(parentId);
+    return ResponseEntity.ok(historyEntries);
   }
 
   @Override
   public ResponseEntity<ParentObjectDto> previewParentAtHistoryEntry(
       String parentId, String historyId) {
-    try {
-      ParentObjectDto parentObject = objectService.previewParentAtHistoryEntry(parentId, historyId);
-      return ResponseEntity.ok(parentObject);
-    } catch (ResourceNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+    ParentObjectDto parentObject = objectService.previewParentAtHistoryEntry(parentId, historyId);
+    return ResponseEntity.ok(parentObject);
   }
 
   @Override
   public ResponseEntity<ParentObjectDto> restoreParentToHistoryEntry(
       String parentId, String historyId) {
-    try {
-      ParentObjectDto restoredParent =
-          objectService.restoreParentToHistoryEntry(parentId, historyId);
-      return ResponseEntity.ok(restoredParent);
-    } catch (ResourceNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+    ParentObjectDto restoredParent = objectService.restoreParentToHistoryEntry(parentId, historyId);
+    return ResponseEntity.ok(restoredParent);
   }
 }
