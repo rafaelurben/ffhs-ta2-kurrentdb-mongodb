@@ -24,6 +24,7 @@ public class ManyRestoresTest {
     apiClient.setReadTimeout(60000);
 
     long[] readHistoryDurations = new long[RESTORE_COUNT];
+    long[] previewDurations = new long[RESTORE_COUNT];
     long[] restoreDurations = new long[RESTORE_COUNT];
     long[] totalEventCounts = new long[RESTORE_COUNT];
 
@@ -51,6 +52,11 @@ public class ManyRestoresTest {
       readHistoryDurations[i] = endTime - startTime;
 
       startTime = System.nanoTime();
+      objectHistoryApi.previewParentAtHistoryEntry(parentId, firstHistoryId);
+      endTime = System.nanoTime();
+      previewDurations[i] = endTime - startTime;
+
+      startTime = System.nanoTime();
       objectHistoryApi.restoreParentToHistoryEntry(parentId, firstHistoryId);
       endTime = System.nanoTime();
       restoreDurations[i] = endTime - startTime;
@@ -65,6 +71,7 @@ public class ManyRestoresTest {
     log.info("ManyRestores Performance Test finished.");
     return new Metric[] {
       new Metric("Read History Durations (ns)", readHistoryDurations),
+      new Metric("Preview Durations (ns)", previewDurations),
       new Metric("Restore Durations (ns)", restoreDurations),
       new Metric("Total Event Counts (events)", totalEventCounts)
     };
