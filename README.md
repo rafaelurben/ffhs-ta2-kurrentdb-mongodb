@@ -1,6 +1,16 @@
 # ffhs-ta2-kurrentdb-mongodb
 
-Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
+Dies ist der Code zu meiner zweiten Transferarbeit an der [FFHS](https://ffhs.ch) im Rahmen meines Informatik-Studiums.
+
+In der Arbeit geht es um einen Vergleich von zwei API-Implementierungen, die auf unterschiedlichen Datenbanken basieren:
+MongoDB und KurrentDB. Die Implementierungen sind in Java geschrieben und nutzen Spring Boot, die API ist mittels
+OpenAPI v3.0.3 spezifiziert.
+
+Die weitere Dokumentation ist in Englisch gehalten, um Sprachwechsel zwischen Code und Dokumentation zu vermeiden.
+
+## Documentation
+
+See [docs](docs/README.md).
 
 ## Requirements
 
@@ -51,7 +61,6 @@ Transferarbeit 2 an der FFHS zum Thema KurrentDB vs MongoDB
 | MongoDB admin (mongo-express)          | [27018](http://localhost:27018) |
 | API Implementation 2 (KurrentDB)       | 8182                            |
 | KurrentDB database (incl. embedded UI) | [2113](http://localhost:2113)   |
-
 
 ## Uninstallation / Cleanup
 
